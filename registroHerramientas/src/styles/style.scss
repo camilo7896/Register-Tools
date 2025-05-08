@@ -1,4 +1,4 @@
-$navbarPrimary-Color:#101828;
+$Primary-Color:#101828;
 
 
 // .primery-color{
@@ -10,9 +10,16 @@ $navbarPrimary-Color:#101828;
 
 
 footer{
-    background-color: $navbarPrimary-Color;
+    background-color: $Primary-Color;
     position: absolute;
     bottom: 0px;
     color: white;
     text-align: center;
+}
+
+
+.primary-color{
+    border-radius: 5px;
+   background-color: $Primary-Color;
+   color: white;
 }
