@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { getFirestore, collection, getDocs, type DocumentData, QueryDocumentSnapshot, query, orderBy, startAfter, limit, updateDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, type DocumentData, QueryDocumentSnapshot, query, orderBy, startAfter, limit, updateDoc, doc, Timestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import appFirebase from "../../lib/credentialFirebase";
+import { serverTimestamp } from "firebase/firestore";
 import Search from "../search/Search";
 const db = getFirestore(appFirebase);
 const auth = getAuth(appFirebase);
@@ -12,7 +13,9 @@ type Tool = {
     responsible: string;
     tool: string;
     reason: string;
+    receivedAt: Timestamp;
     destination: string;
+    receivedBy: string;
     status: string;
     returnDate: string;
     // Agrega más campos si tienes
@@ -73,20 +76,20 @@ const Register: React.FC = () => {
         tool.tool.toLowerCase().includes(search.toLocaleLowerCase())
     );
     const handleSetOk = async (id: string) => {
-    const user = auth.currentUser;
-    await updateDoc(doc(db, "tools", id), {
-        status: "ok",
-        receivedBy: user ? user.email : "desconocido", // o user.uid si prefieres
-        receivedAt: new Date() // opcional: guarda la fecha de recepción
-    });
-    setTools(prev =>
-        prev.map(tool =>
-            tool.id === id
-                ? { ...tool, status: "ok", receivedBy: user ? user.email : "desconocido" }
-                : tool
-        )
-    );
-};
+        const user = auth.currentUser;
+        await updateDoc(doc(db, "tools", id), {
+            status: "ok",
+            receivedBy: user ? user.email : "desconocido", // o user.uid si prefieres
+            receivedAt: serverTimestamp()
+        });
+        setTools(prev =>
+            prev.map(tool =>
+                tool.id === id
+                    ? { ...tool, status: "ok", receivedBy: user && user.email ? user.email : "desconocido" }
+                    : tool
+            )
+        );
+    };
     return (
         <>
             <div>
@@ -96,35 +99,44 @@ const Register: React.FC = () => {
                 <div className="flex flex-row flex-wrap gap-4 justify-center">
                     {filteredTools.map(tool => (
                         <div key={tool.id} className="max-w-sm my-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                            <a href="#">
-                                <img className="rounded-t-lg" src="/docs/images/blog/image-1.jpg" alt="" />
-                            </a>
+                            {tool.receivedAt && (
+                                <div className="text-xs text-white mx-2">
+                                    Recibido el:{" "}
+                                    {tool.receivedAt.toDate
+                                        ? tool.receivedAt.toDate().toLocaleString()
+                                        : new Date(tool.receivedAt.seconds * 1000).toLocaleString()}
+                                </div>
+                            )}
                             <div className="p-5">
+
                                 <a href="#">
                                     <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{tool.tool}</h5>
                                 </a>
                                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                     <strong>{tool.responsible}</strong> indica que solicita la salida de <strong>{tool.tool}</strong> por motivo de <strong>{tool.reason}</strong> y que sera devuelto el <strong>{tool.returnDate}</strong>
                                 </p>
-                           
+
+                            </div>
+                            <div>
+                                { }
                             </div>
                             {/* Estado de la herramienta y opcion de cambio */}
-                            <div className="flex justify-evenly px-5">
-                               <div>
-
-                                <span className={`px-2 py-1 rounded text-xs font-bold ${tool.status === "ok" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
-                                    {tool.status === "ok" ? "OK" : "FUERA"}
-                                </span>
-                               </div>
+                            <div className="flex justify-evenly px-5 mb-3">
                                 <div>
-                                <button
-                                    className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
-                                    disabled={tool.status === "ok"}
-                                    onClick={() => handleSetOk(tool.id)}
+
+                                    <span className={`px-2 py-1 rounded text-xs font-bold ${tool.status === "ok" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
+                                        {tool.status === "ok" ? "OK" : "FUERA"}
+                                    </span>
+                                </div>
+                                <div>
+                                    <button
+                                        className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
+                                        disabled={tool.status === "ok"}
+                                        onClick={() => handleSetOk(tool.id)}
                                     >
-                                    Recibir
-                                </button>
-                                    </div>
+                                        {tool.status == "ok" ? `Recibido por ${tool.receivedBy}` : "recibir"}
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="bg-blue-950 text-white px-2 flex justify-end">

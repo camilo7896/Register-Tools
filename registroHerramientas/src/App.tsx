@@ -4,7 +4,7 @@ import { onAuthStateChanged, getAuth } from 'firebase/auth';
 import appFirebase from './lib/credentialFirebase'
 import type { Auth, User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import Home from './pages/Home';
+import HomePage from './pages/HomePage';
 
 const auth: Auth = getAuth(appFirebase);
 
@@ -31,7 +31,12 @@ function App() {
 
   return (
     <>
-      {user ? <Home emailUser={user.email} /> : <Login />}
+    <div className="min-h-screen flex flex-col">
+       <main className="flex-grow">
+      {user ? <HomePage emailUser={user.email} /> : <Login />}
+ 
+       </main>
+    </div>
 
     </>
   )

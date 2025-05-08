@@ -1,21 +1,22 @@
-import Dashboard from "../components/dashboard/Dashboard";
+import Home from "../components/home/Home";
 import Navbar from "../components/Navbar";
 
 type LoginProps = {
   emailUser: string | null;
 };
 
-const Home: React.FC<LoginProps> = ({ emailUser }) => {
+const HomePage: React.FC<LoginProps> = ({ emailUser }) => {
 
   
 
     return (
         <>
         <Navbar Userloged={emailUser} />
-        <Dashboard/>   
+          
+        <Home/>
         
         </>
     );
 }
 
-export default Home;
+export default HomePage;
