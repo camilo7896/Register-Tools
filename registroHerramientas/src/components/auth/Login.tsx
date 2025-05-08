@@ -41,6 +41,7 @@ const Login: React.FC = () => {
             if (!userDoc.exists()) {
                 // Si es la primera vez, crea el documento con rol null o "pendiente"
                 await setDoc(userDocRef, {
+                    id:user.uid,
                     email: user.email,
                     role: null // o "pendiente"
                 });
@@ -61,6 +62,7 @@ const Login: React.FC = () => {
             const userDoc = await getDoc(userDocRef);
             if (!userDoc.exists()) {
                 await setDoc(userDocRef, {
+                    id:user.uid,
                     email: user.email,
                     role: null // o "pendiente"
                 });

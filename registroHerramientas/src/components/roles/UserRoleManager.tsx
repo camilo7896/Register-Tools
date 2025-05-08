@@ -48,12 +48,12 @@ const UserRoleManager = () => {
   return (
     <>
     <Navbar/>
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded shadow">
+    <div className="max-w-2xl mx-2  bg-white rounded shadow">
       <h2 className="text-xl font-bold mb-4">Usuarios registrados y asignación de roles</h2>
       {loading ? (
         <div>Cargando usuarios...</div>
       ) : (
-        <table className="w-full border">
+        <table className="w-auto border bg-gray-200">
           <thead>
             <tr>
               <th className="border px-2 py-1">Email</th>
