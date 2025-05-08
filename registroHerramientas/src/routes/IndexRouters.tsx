@@ -24,7 +24,7 @@ const IndexRouters: React.FC = () => (
         </ProtectedRoute>
       } />
        <Route path="/admin" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["superadmin"]}>
           <Suspense fallback={<div>"Cargando..."</div>}>
           <UserRoleManager />
           </Suspense>

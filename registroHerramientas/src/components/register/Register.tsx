@@ -17,6 +17,7 @@ type Tool = {
     receivedAt: Timestamp;
     destination: string;
     receivedBy: string;
+    autorized: string;
     status: string;
     returnDate: string;
     // Agrega más campos si tienes
@@ -26,6 +27,8 @@ const Register: React.FC = () => {
     const [tools, setTools] = useState<Tool[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    const [userRole, setUserRole] = useState<string | null>(null);
+
 
     const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
     const [hasMore, setHasMore] = useState(true);
@@ -64,6 +67,17 @@ const Register: React.FC = () => {
     };
 
     useEffect(() => {
+        const fetchUserRole = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDocs(query(collection(db, "users")));
+                const userData = userDoc.docs.find(docu => docu.data().email === user.email);
+                if (userData) {
+                    setUserRole(userData.data().role || null);
+                }
+            }
+        };
+        fetchUserRole();
         fetchTools();
         // eslint-disable-next-line
     }, []);
@@ -91,12 +105,30 @@ const Register: React.FC = () => {
             )
         );
     };
+
+    const handleAutirized = async (id: string) => {
+        const user = auth.currentUser;
+        await updateDoc(doc(db, "tools", id), {
+            autorized: user?.email || "desconocido"
+        });
+        setTools(prev =>
+            prev.map(tool =>
+                tool.id === id
+                    ? { ...tool, autorized: user?.email || "desconocido" }
+                    : tool
+            )
+        );
+    };
+
+
     return (
         <>
             <div>
                 <div >
                     <Search value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar herramienta..." />
                 </div>
+
+
                 <div className="flex flex-row flex-wrap gap-4 justify-center">
                     {filteredTools.map(tool => (
                         <div key={tool.id} className="max-w-sm my-5  border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -108,6 +140,11 @@ const Register: React.FC = () => {
                                         : new Date(tool.receivedAt.seconds * 1000).toLocaleString()}
                                 </div>
                             )}
+                            {tool.autorized && (
+                                <div className="text-xs text-indigo-700 font-semibold text-center my-2">
+                                    Autorizado por {tool.autorized}
+                                </div>
+                            )}
                             <div className="p-5">
                                 <a href="#">
                                     <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{tool.tool}</h5>
@@ -116,6 +153,7 @@ const Register: React.FC = () => {
                                     <strong>{tool.responsible}</strong> indica que solicita la salida de <strong>{tool.tool}</strong> por motivo de <strong>{tool.reason}</strong> y que sera devuelto el <strong>{tool.returnDate}</strong>
                                 </p>
                             </div>
+
                             {/* Estado de la herramienta y opcion de cambio */}
                             <div className="flex justify-evenly px-5 mb-3">
                                 <div>
@@ -132,7 +170,17 @@ const Register: React.FC = () => {
                                         {tool.status == "ok" ? `Recibido por ${tool.receivedBy}` : "recibir"}
                                     </button>
                                 </div>
+                                {userRole === "admin" && (
+                                    <button
+                                        className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
+                                        onClick={() => handleAutirized(tool.id)}
+                                    >
+                                        Autorizar
+                                    </button>
+                                )}
                             </div>
+
+
 
                             <div className="bg-blue-950 text-white px-2 flex justify-end">
                                 <small>{tool.date}</small>
@@ -140,6 +188,7 @@ const Register: React.FC = () => {
                         </div>
                     ))}
                 </div>
+
 
                 {hasMore && (
                     <div className="flex justify-center my-4">
@@ -150,6 +199,7 @@ const Register: React.FC = () => {
                         >
                             {loading ? "Cargando..." : "Cargar más"}
                         </button>
+
                     </div>
                 )}
             </div>
