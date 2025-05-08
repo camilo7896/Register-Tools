@@ -1,3 +1,4 @@
+import Dashboard from "../components/dashboard/Dashboard";
 import Navbar from "../components/Navbar";
 
 type LoginProps = {
@@ -11,8 +12,7 @@ const Home: React.FC<LoginProps> = ({ emailUser }) => {
     return (
         <>
         <Navbar Userloged={emailUser} />
-        
-      
+        <Dashboard/>   
         
         </>
     );

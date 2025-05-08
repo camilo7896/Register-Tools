@@ -13,6 +13,7 @@ interface FormData {
     reason: string;
     destination: string;
     returnDate: string;
+    status: string;
     photo: File[];
     subPiece?: string;
 }
@@ -29,6 +30,7 @@ const ToolForm: React.FC = () => {
         reason: "",
         destination: "",
         returnDate: "",
+        status: "",
         photo: [],
         subPiece: "",
     });
@@ -65,6 +67,7 @@ const ToolForm: React.FC = () => {
                 reason: formData.reason.toUpperCase(),
                 destination: formData.destination,
                 returnDate: formData.returnDate,
+                status: "fuera",
                 subPiece: formData.subPiece,
                 // Las fotos se manejan aparte (ver nota abajo)
             });
@@ -78,6 +81,7 @@ const ToolForm: React.FC = () => {
                 reason: "",
                 destination: "",
                 returnDate: "",
+                status: "",
                 photo: [],
                 subPiece: "",
             });
@@ -188,6 +192,7 @@ const ToolForm: React.FC = () => {
                         className="shadow-xs bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-xs-light"
                         required
                     />
+                 
 
                     {/* Subir foto del objeto. hasta 4 fotos */}
                     <label htmlFor="photo" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">

@@ -2,7 +2,7 @@ import LogoCaballo from "../assets/logo-grapas-y-puntillas-el-caballo.png";
 import { useState, useRef, useEffect } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import appFirebase from "../lib/credentialFirebase";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const auth = getAuth(appFirebase);
 
@@ -32,10 +32,12 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
     }, [menuOpen]);
 
     //funcion logouot
+    const navigate = useNavigate();
     const handleLogout = () => {
         signOut(auth)
             .then(() => {
                 console.log("Usuario deslogueado");
+                navigate('/')
             })
             .catch((error) => {
                 console.error("Error al cerrar sesión:", error);
@@ -83,7 +85,7 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                                     <Link to="/register" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                                 </li>
                                 <li>
-                                    <Link to="/autorizar" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Autorizar</Link>
+                                    <Link to="/admin" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Dashboard</Link>
                                 </li>
                             </ul>
                             <button onClick={handleLogout} className="bg-gray-600 text-white text-center block w-full font-semibold px-4 py-2 text-sm hover:bg-gray-500 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
@@ -100,7 +102,7 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                                 <Link to="/register" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                             </li>
                             <li>
-                                <Link to="/autorizar" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Autorizar</Link>
+                                <Link to="/admin" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Autorizar</Link>
                             </li>
                         </ul>
                     </div>
