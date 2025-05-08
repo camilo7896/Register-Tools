@@ -68,7 +68,7 @@ const ToolForm: React.FC = () => {
                 subPiece: formData.subPiece,
                 // Las fotos se manejan aparte (ver nota abajo)
             });
-            alert("¡Registro guardado en Firestore!");
+            alert("¡Registro exitoso!");
             // Limpia el formulario si quieres
             setFormData({
                 date: "",
