@@ -160,24 +160,30 @@ const UserRoleManager = () => {
       </div>
 
       {/* opcion de descargar registros */}
-     <div className="flex flex-col justify-center items-center m-3 p-3 bg-gray-100 w-full">
+     <div className="flex flex-col">
       <div>
-        <h2 className="text-xl font-bold mb-4">
+        <h2 className="text-xl text-center font-bold">
           Descargar registros
           </h2>
       </div>
-       <div className="flex gap-2 my-4 items-center ">
+       <div className="flex gap-3 flex-wrap my-4 items-center ">
+
+        <div className="flex flex-col items-center">
         <label>Desde:</label>
         <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="border rounded px-2 py-1" />
+        </div>
+        <div className="flex flex-col items-center">
         <label>Hasta:</label>
         <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="border rounded px-2 py-1" />
-        <button
-          className="bg-blue-600 text-white px-3 py-1 rounded"
+        </div>
+
+      </div>
+       <button
+          className="primary-color text-white px-3 py-1 rounded"
           onClick={handleDownloadCSV}
         >
           Descargar CSV
         </button>
-      </div>
      </div>
      </div>
     </>

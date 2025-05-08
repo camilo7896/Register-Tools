@@ -94,7 +94,8 @@ const ToolForm: React.FC = () => {
 
     return (
         <>
-
+    <div className="m-5">
+        
             <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
                 <div className="mb-5">
                     {/* //date */}
@@ -212,9 +213,10 @@ const ToolForm: React.FC = () => {
                     )}
                 </div>
 
-                <button type="submit" className="text-white bg-blue-950 hover:bg-blue-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-900">Register salida</button>
+                <button type="submit" className="text-white bg-blue-950 hover:bg-blue-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-950 dark:hover:bg-blue-900 dark:focus:ring-blue-900">Registrar salida</button>
             </form>
 
+    </div>
 
         </>
     )

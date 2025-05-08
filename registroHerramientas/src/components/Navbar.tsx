@@ -51,7 +51,7 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
             <nav className="border-gray-200 dark:bg-gray-900 p-5 navbar-bg">
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">El Caballo S.A</span>
+                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Registros</span>
                     </Link>
                     <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
                         <button
