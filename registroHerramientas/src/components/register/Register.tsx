@@ -73,9 +73,10 @@ if (loading) {
 
     return (
         <>
-        <div>
+        <div>               
+            <div >
             <Search value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar herramienta..." />
-                
+            </div>
                 <div className="flex flex-row flex-wrap gap-4 justify-center">
                 {filteredTools.map(tool => (
                     <div key={tool.id} className="max-w-sm my-5 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
