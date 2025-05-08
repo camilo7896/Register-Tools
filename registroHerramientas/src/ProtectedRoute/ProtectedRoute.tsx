@@ -27,6 +27,7 @@ const ProtectedRoute: React.FC<Props> = ({ allowedRoles, children }) => {
       <div className="max-w-lg mx-auto mt-10 text-center text-red-600">
         No tienes permiso para acceder a esta opción.<br />
         Solicita autorización al administrador.
+        <hr />
         <BackButton/>
       </div>
     );

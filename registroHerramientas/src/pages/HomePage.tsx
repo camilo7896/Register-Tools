@@ -14,6 +14,7 @@ const HomePage: React.FC<LoginProps> = ({ emailUser }) => {
         <Navbar Userloged={emailUser} />
           
         <Home/>
+        
         </>
     );
 }

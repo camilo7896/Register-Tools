@@ -140,8 +140,10 @@ const Login: React.FC = () => {
                             </button>
                         </div>
                     </form>
+                    
                     <div className="flex mt-4 items-center justify-center flex-wrap">
-                        <button onClick={handleGoogleLogin} className="m-3 flex flex-col items-center justify-center">
+                      
+                        <button onClick={handleGoogleLogin} className="m-3 flex flex-col items-center justify-center cursor-pointer p-2 rounded-2xl hover:bg-amber-100">
                             <svg
                                 width="3vh"
                                 height="auto"
@@ -166,8 +168,10 @@ const Login: React.FC = () => {
                                     fill="#EB4335"
                                 />
                             </svg>
-                            Iniciar con Google</button>
-                        <button onClick={handleMicrosoftLogin} className="m-3 flex flex-col items-center justify-center">
+                            Iniciar con Google
+                            </button>
+
+                        <button onClick={handleMicrosoftLogin} className="m-3 flex flex-col items-center justify-center cursor-pointer  p-2 rounded-2xl hover:bg-red-100">
                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="3vh" height="auto" viewBox="0 0 48 48">
                                 <path fill="#ff5722" d="M6 6H22V22H6z" transform="rotate(-180 14 14)"></path><path fill="#4caf50" d="M26 6H42V22H26z" transform="rotate(-180 34 14)"></path><path fill="#ffc107" d="M26 26H42V42H26z" transform="rotate(-180 34 34)"></path><path fill="#03a9f4" d="M6 26H22V42H6z" transform="rotate(-180 14 34)"></path>
                             </svg>
