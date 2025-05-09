@@ -23,7 +23,7 @@ type Tool = {
     // Agrega más campos si tienes
 };
 
-const Register: React.FC = () => {
+const Register: React.FC<Tool> = () => {
     const [tools, setTools] = useState<Tool[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -32,7 +32,7 @@ const Register: React.FC = () => {
 
     const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
     const [hasMore, setHasMore] = useState(true);
-    const PAGE_SIZE = 3; // Numero de cards que se va a mostrar
+    const PAGE_SIZE = 6; // Numero de cards que se va a mostrar
 
     const fetchTools = async (nextPage = false) => {
         setLoading(true);
@@ -124,14 +124,14 @@ const Register: React.FC = () => {
     return (
         <>
             <div>
-                <div >
+                <div className="mb-3">
                     <Search value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar herramienta..." />
                 </div>
 
 
                 <div className="flex flex-row flex-wrap gap-4 justify-center">
                     {filteredTools.map(tool => (
-                        <div key={tool.id} className="max-w-sm my-5  border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                        <div key={tool.id} className="max-w-sm bg-gray-100 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col justify-between h-[300px]">
                             {tool.receivedAt && (
                                 <div className="primary-color">
                                     Recibido el:{" "}
@@ -141,13 +141,14 @@ const Register: React.FC = () => {
                                 </div>
                             )}
                             {tool.autorized && (
-                                <div className="text-xs text-indigo-700 font-semibold text-center my-2">
+                                <div className="tracking-tight text-gray-900 dark:text-white my-2 ml-2">
                                     Autorizado por {tool.autorized}
                                 </div>
                             )}
                             <div className="p-5">
                                 <a href="#">
-                                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{tool.tool}</h5>
+                                    <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{tool.tool}</h5>
+                                    <small className="tracking-tight text-gray-900 dark:text-white">Fecha de registro: {tool.date}</small>
                                 </a>
                                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                     <strong>{tool.responsible}</strong> indica que solicita la salida de <strong>{tool.tool}</strong> por motivo de <strong>{tool.reason}</strong> y que sera devuelto el <strong>{tool.returnDate}</strong>
@@ -156,11 +157,13 @@ const Register: React.FC = () => {
 
                             {/* Estado de la herramienta y opcion de cambio */}
                             <div className="flex justify-evenly px-5 mb-3">
-                                <div>
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${tool.status === "ok" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
-                                        {tool.status === "ok" ? "OK" : "FUERA"}
-                                    </span>
-                                </div>
+                                {tool.status !== "ok" && (
+                                    <div>
+                                        <span className="px-2 py-1 rounded text-xs font-bold bg-red-500 text-white">
+                                            FUERA
+                                        </span>
+                                    </div>
+                                )}
                                 <div>
                                     <button
                                         className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
@@ -169,22 +172,17 @@ const Register: React.FC = () => {
                                     >
                                         {tool.status == "ok" ? `Recibido por ${tool.receivedBy}` : "recibir"}
                                     </button>
+                                    {userRole === "admin" && (
+                                        <button
+                                            className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
+                                            onClick={() => handleAutirized(tool.id)}
+                                        >
+                                            Autorizar
+                                        </button>
+                                    )}
                                 </div>
-                                {userRole === "admin" && (
-                                    <button
-                                        className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
-                                        onClick={() => handleAutirized(tool.id)}
-                                    >
-                                        Autorizar
-                                    </button>
-                                )}
                             </div>
 
-
-
-                            <div className="bg-blue-950 text-white px-2 flex justify-end">
-                                <small>{tool.date}</small>
-                            </div>
                         </div>
                     ))}
                 </div>

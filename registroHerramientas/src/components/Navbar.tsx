@@ -3,8 +3,13 @@ import { getAuth, signOut } from "firebase/auth";
 import appFirebase from "../lib/credentialFirebase";
 import { Link, useNavigate } from "react-router";
 import '../styles/navbar/styleNavbar.scss';
+import { collection, getDocs, getFirestore, query } from "firebase/firestore";
 
 const auth = getAuth(appFirebase);
+const db = getFirestore(appFirebase);
+
+
+
 
 type userProps = {
     Userloged?: string | null;
@@ -12,10 +17,11 @@ type userProps = {
 
 const Navbar: React.FC<userProps> = ({ Userloged }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Cierra el menú si se hace clic fuera
     useEffect(() => {
+            // Cierra el menú si se hace clic fuera
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setMenuOpen(false);
@@ -44,7 +50,17 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
             });
     };
 
-
+const fetchUserRole = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDocs(query(collection(db, "users")));
+                const userData = userDoc.docs.find(docu => docu.data().email === user.email);
+                if (userData) {
+                    setUserRole(userData.data().role || null);
+                }
+            }
+        };
+        fetchUserRole();
 
     return (
         <>
@@ -89,9 +105,11 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                                 <li>
                                     <Link to="/register" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                                 </li>
+                                {userRole !== "superadmin"?"":
                                 <li>
                                     <Link to="/admin" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Administrador</Link>
                                 </li>
+                                }
                             </ul>
                             <button onClick={handleLogout} className="bg-gray-600 text-white text-center block w-full font-semibold px-4 py-2 text-sm hover:bg-gray-500 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                                 Cerrar sesión
@@ -106,9 +124,11 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                             <li>
                                 <Link to="/register" className="items block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                             </li>
-                            <li>
-                                <Link to="/admin" className="items block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Autorizar</Link>
-                            </li>
+                             {userRole !== "superadmin"?"":
+                                <li>
+                                    <Link to="/admin" className="text-white block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Administrador</Link>
+                                </li>
+                                }
                         </ul>
                     </div>
                 </div>
