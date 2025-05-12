@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LogoCaballo from "../../assets/logo-grapas-y-puntillas-el-caballo.png";
+import Logo from "../../assets/iconoApp.png";
 import appFirebase from "../../lib/credentialFirebase";
 import type { Auth } from 'firebase/auth';
 
@@ -79,8 +79,8 @@ const Login: React.FC = () => {
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     <img
                         alt="Your Company"
-                        src={LogoCaballo}
-                        className="mx-auto h-10% w-auto"
+                        src={Logo}
+                        className="mx-auto h-32 w-auto"
                     />
                     <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                         Registro de herramientas

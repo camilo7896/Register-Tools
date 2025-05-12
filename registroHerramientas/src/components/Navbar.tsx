@@ -3,8 +3,13 @@ import { getAuth, signOut } from "firebase/auth";
 import appFirebase from "../lib/credentialFirebase";
 import { Link, useNavigate } from "react-router";
 import '../styles/navbar/styleNavbar.scss';
+import { collection, getDocs, getFirestore, query } from "firebase/firestore";
 
 const auth = getAuth(appFirebase);
+const db = getFirestore(appFirebase);
+
+
+
 
 type userProps = {
     Userloged?: string | null;
@@ -12,10 +17,11 @@ type userProps = {
 
 const Navbar: React.FC<userProps> = ({ Userloged }) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Cierra el menú si se hace clic fuera
     useEffect(() => {
+        // Cierra el menú si se hace clic fuera
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setMenuOpen(false);
@@ -44,14 +50,24 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
             });
     };
 
-
+    const fetchUserRole = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            const userDoc = await getDocs(query(collection(db, "users")));
+            const userData = userDoc.docs.find(docu => docu.data().email === user.email);
+            if (userData) {
+                setUserRole(userData.data().role || null);
+            }
+        }
+    };
+    fetchUserRole();
 
     return (
         <>
             <nav className="border-gray-200 dark:bg-gray-900 p-5 navbar-bg">
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">El Caballo S.A</span>
+                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Registros</span>
                     </Link>
                     <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse relative">
                         <button
@@ -63,10 +79,10 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                         >
                             <div className="flex flex-col items-center">
 
-                            <div className=" relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                                <svg className="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-                            </div>
-                                    <small className="text-white mt-2">Abrir menu</small>
+                                <div className=" relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+                                    <svg className="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <small className="text-white mt-2">Abrir menu</small>
                             </div>
 
                         </button>
@@ -89,9 +105,17 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                                 <li>
                                     <Link to="/register" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                                 </li>
-                                <li>
-                                    <Link to="/admin" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Administrador</Link>
-                                </li>
+                                {userRole === "superadmin" && (
+                                    <li>
+                                        <Link
+                                            to="/admin"
+                                            className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                                        >
+                                            Administrador
+                                        </Link>
+                                    </li>
+                                )}
+
                             </ul>
                             <button onClick={handleLogout} className="bg-gray-600 text-white text-center block w-full font-semibold px-4 py-2 text-sm hover:bg-gray-500 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                                 Cerrar sesión
@@ -106,9 +130,17 @@ const Navbar: React.FC<userProps> = ({ Userloged }) => {
                             <li>
                                 <Link to="/register" className="items block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Registro</Link>
                             </li>
-                            <li>
-                                <Link to="/admin" className="items block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Autorizar</Link>
-                            </li>
+                            {userRole === "superadmin" && (
+                                <li>
+                                    <Link
+                                        to="/admin"
+                                        className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                                    >
+                                        Administrador
+                                    </Link>
+                                </li>
+                            )}
+
                         </ul>
                     </div>
                 </div>

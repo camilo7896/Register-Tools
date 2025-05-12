@@ -12,19 +12,19 @@ const IndexRouters: React.FC = () => (
     <>
       <Route path="/" element={<App />} />
       <Route path="/formtool" element={
-          <ProtectedRoute allowedRoles={["admin", "autorizador","quien_recibe"]}>
+          <ProtectedRoute allowedRoles={["admin","porteria", "autorizador","quien_recibe","superadmin"]}>
           <FormRegisterTools />
         </ProtectedRoute>
       } />
       <Route path="/register" element={
-          <ProtectedRoute allowedRoles={["admin","porteria","quien_recibe"]}>
+          <ProtectedRoute allowedRoles={["admin","quien_recibe","superadmin"]}>
           <Suspense fallback={<div>"Cargando..."</div>}>
           <HistoryRegister />
           </Suspense>
         </ProtectedRoute>
       } />
        <Route path="/admin" element={
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["superadmin"]}>
           <Suspense fallback={<div>"Cargando..."</div>}>
           <UserRoleManager />
           </Suspense>
