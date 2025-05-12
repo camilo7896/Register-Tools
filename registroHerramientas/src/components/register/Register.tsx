@@ -12,15 +12,14 @@ import {
   updateDoc,
   doc,
   Timestamp,
-  serverTimestamp,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 import appFirebase from "../../lib/credentialFirebase";
+import { serverTimestamp } from "firebase/firestore";
 import Search from "../search/Search";
 import "../../styles/style.scss";
 import PhotoModal from "../modals/PhotoModal";
-
 const db = getFirestore(appFirebase);
 const auth = getAuth(appFirebase);
 
@@ -30,16 +29,16 @@ type ToolProps = {
   responsible: string;
   tool: string;
   reason: string;
-  receivedAt?: Timestamp;
+  receivedAt: Timestamp;
   destination: string;
-  receivedBy?: string;
-  authorized?: string;
+  receivedBy: string;
+  autorized: string;
   status: string;
   returnDate: string;
   photos: string[];
 };
 
-const Register: React.FC = () => {
+const Register: React.FC<ToolProps> = () => {
   const [tools, setTools] = useState<ToolProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -47,6 +46,10 @@ const Register: React.FC = () => {
 
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [photoLoading, setPhotoLoading] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const openModal = (url: string) => {
     setSelectedPhoto(url);
@@ -80,19 +83,16 @@ const Register: React.FC = () => {
         limit(PAGE_SIZE)
       );
     }
-
     const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map((doc) => ({
+    const data: ToolProps[] = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     })) as ToolProps[];
-
     if (nextPage) {
       setTools((prev) => [...prev, ...data]);
     } else {
       setTools(data);
     }
-
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setHasMore(querySnapshot.docs.length === PAGE_SIZE);
     setLoading(false);
@@ -124,44 +124,55 @@ const Register: React.FC = () => {
   }
 
   const filteredTools = tools.filter((tool) =>
-    tool.tool?.toLowerCase().includes(search.toLowerCase())
+    tool.tool.toLowerCase().includes(search.toLocaleLowerCase())
   );
 
   const handleSetOk = async (id: string) => {
     const user = auth.currentUser;
     await updateDoc(doc(db, "tools", id), {
       status: "ok",
-      receivedBy: user?.email || "desconocido",
+      receivedBy: user ? user.email : "desconocido",
       receivedAt: serverTimestamp(),
     });
-
     setTools((prev) =>
       prev.map((tool) =>
         tool.id === id
           ? {
               ...tool,
               status: "ok",
-              receivedBy: user?.email || "desconocido",
-              receivedAt: Timestamp.now(),
+              receivedBy: user && user.email ? user.email : "desconocido",
             }
           : tool
       )
     );
   };
 
-  const handleAuthorized = async (id: string) => {
+  const handleAutirized = async (id: string) => {
     const user = auth.currentUser;
     await updateDoc(doc(db, "tools", id), {
-      authorized: user?.email || "desconocido",
+      autorized: user?.email || "desconocido",
     });
-
     setTools((prev) =>
       prev.map((tool) =>
         tool.id === id
-          ? { ...tool, authorized: user?.email || "desconocido" }
+          ? { ...tool, autorized: user?.email || "desconocido" }
           : tool
       )
     );
+  };
+
+  const handleImageLoad = (url: string) => {
+    setPhotoLoading((prevState) => ({
+      ...prevState,
+      [url]: false,
+    }));
+  };
+
+  const handleImageError = (url: string) => {
+    setPhotoLoading((prevState) => ({
+      ...prevState,
+      [url]: false,
+    }));
   };
 
   return (
@@ -182,38 +193,42 @@ const Register: React.FC = () => {
               className="max-w-sm bg-gray-100 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col justify-between h-[400px]"
             >
               {tool.receivedAt && (
-                <div className="text-sm text-blue-700 px-3 pt-2">
+                <div className="primary-color">
                   Recibido el:{" "}
                   {tool.receivedAt.toDate
                     ? tool.receivedAt.toDate().toLocaleString()
                     : new Date(tool.receivedAt.seconds * 1000).toLocaleString()}
                 </div>
               )}
-              {tool.authorized && (
+              {tool.autorized && (
                 <div className="tracking-tight text-gray-900 dark:text-white my-2 ml-2">
-                  Autorizado por {tool.authorized}
+                  Autorizado por {tool.autorized}
                 </div>
               )}
               <div className="p-5">
-                <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                  {tool.tool}
-                </h5>
-                <small className="block mb-2 text-gray-600">
-                  Fecha de registro: {tool.date}
-                </small>
+                <a href="#">
+                  <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    {tool.tool}
+                  </h5>
+                  <small className="tracking-tight text-gray-900 dark:text-white">
+                    Fecha de registro: {tool.date}
+                  </small>
+                </a>
                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                   <strong>{tool.responsible}</strong> indica que solicita la
                   salida de <strong>{tool.tool}</strong> por motivo de{" "}
-                  <strong>{tool.reason}</strong> y que será devuelto el{" "}
+                  <strong>{tool.reason}</strong> y que sera devuelto el{" "}
                   <strong>{tool.returnDate}</strong>
                 </p>
               </div>
 
-              <div className="flex justify-evenly items-center mb-2">
+              <div className="flex justify-evenly">
                 {tool.status !== "ok" && (
-                  <span className="px-2 py-1 rounded text-xs font-bold bg-red-500 text-white">
-                    FUERA
-                  </span>
+                  <div>
+                    <span className="px-2 py-1 rounded text-xs font-bold bg-red-500 text-white">
+                      FUERA
+                    </span>
+                  </div>
                 )}
                 <div>
                   <button
@@ -223,12 +238,12 @@ const Register: React.FC = () => {
                   >
                     {tool.status === "ok"
                       ? `Recibido por ${tool.receivedBy}`
-                      : "Recibir"}
+                      : "recibir"}
                   </button>
                   {userRole === "admin" && (
                     <button
                       className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
-                      onClick={() => handleAuthorized(tool.id)}
+                      onClick={() => handleAutirized(tool.id)}
                     >
                       Autorizar
                     </button>
@@ -236,21 +251,31 @@ const Register: React.FC = () => {
                 </div>
               </div>
 
-              {tool.photos?.length > 0 && (
-                <div className="flex items-center justify-center pb-3">
+              <div className="flex items-center justify-center pb-3">
+                {tool.photos && tool.photos.length > 0 && (
                   <div className="overflow-x-auto flex gap-2 p-2">
                     {tool.photos.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Foto ${index + 1}`}
-                        className="h-20 w-20 object-cover rounded cursor-pointer"
-                        onClick={() => openModal(url)}
-                      />
+                      <div key={index} className="relative">
+                        {/* Mostrar "Cargando..." mientras la imagen no ha cargado */}
+                        {photoLoading[url] && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 text-black">
+                            <span>Cargando...</span>
+                          </div>
+                        )}
+                        <img
+                          src={url}
+                          alt={`Foto ${index + 1}`}
+                          className="h-20 w-20 object-cover rounded cursor-pointer"
+                          loading="lazy"
+                          onClick={() => openModal(url)}
+                          onLoad={() => handleImageLoad(url)}
+                          onError={() => handleImageError(url)}
+                        />
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>
