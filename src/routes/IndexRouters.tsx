@@ -6,34 +6,55 @@ import { Suspense } from "react";
 import HistoryRegister from "../pages/registers/HistoryRegister";
 import UserRoleManager from "../components/roles/UserRoleManager";
 
-
 const IndexRouters: React.FC = () => (
   <Routes>
     <>
       <Route path="/" element={<App />} />
-      <Route path="/formtool" element={
-          <ProtectedRoute allowedRoles={["admin","porteria", "autorizador","quien_recibe","superadmin"]}>
-          <FormRegisterTools />
-        </ProtectedRoute>
-      } />
-      <Route path="/register" element={
-          <ProtectedRoute allowedRoles={["admin","quien_recibe","superadmin"]}>
-          <Suspense fallback={<div>"Cargando..."</div>}>
-          <HistoryRegister />
-          </Suspense>
-        </ProtectedRoute>
-      } />
-       <Route path="/admin" element={
-          <ProtectedRoute allowedRoles={["superadmin"]}>
-          <Suspense fallback={<div>"Cargando..."</div>}>
-          <UserRoleManager />
-          </Suspense>
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/formtool"
+        element={
+          <ProtectedRoute
+            allowedRoles={[
+              "admin",
+              "porteria",
+              "autorizador",
+              "quien_recibe",
+              "superadmin",
+            ]}
+          >
+            <FormRegisterTools />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <ProtectedRoute
+            allowedRoles={[
+              "admin",
+              "quien_recibe",
+              "superadmin",
+              "autorizador",
+            ]}
+          >
+            <Suspense fallback={<div>"Cargando..."</div>}>
+              <HistoryRegister />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["superadmin", "admin"]}>
+            <Suspense fallback={<div>"Cargando..."</div>}>
+              <UserRoleManager />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
     </>
-    <Route path="*" element={
-      <h1>404 Not Found</h1>
-    } />
+    <Route path="*" element={<h1>404 Not Found</h1>} />
   </Routes>
 );
 
