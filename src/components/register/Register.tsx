@@ -20,7 +20,6 @@ import { serverTimestamp } from "firebase/firestore";
 import Search from "../search/Search";
 import "../../styles/style.scss";
 import PhotoModal from "../modals/PhotoModal";
-import axios from "axios";
 const db = getFirestore(appFirebase);
 const auth = getAuth(appFirebase);
 
@@ -35,7 +34,7 @@ type ToolProps = {
   receivedBy: string;
   autorized: string;
   status: string;
-  returnDate: string | Timestamp;
+  returnDate: string;
   photos: string[];
 };
 
@@ -65,8 +64,7 @@ const Register: React.FC<ToolProps> = () => {
   const [lastDoc, setLastDoc] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [hasMore, setHasMore] = useState(true);
-
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 6;
 
   const fetchTools = async (nextPage = false) => {
     setLoading(true);
@@ -177,34 +175,17 @@ const Register: React.FC<ToolProps> = () => {
     }));
   };
 
-  // Integracio api AI
-  const callDeepAI = async (prompt: string): Promise<string> => {
-    const API_KEY = "tu-api-key-de-openai"; // ¡NO compartas esto en producción!
-    try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/completions",
-        {
-          model: "text-davinci-003",
-          prompt: prompt,
-          max_tokens: 150,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        }
-      );
-      const text = response.data.choices[0].text;
-      return text;
-    } catch (error) {
-      console.error("Error calling DeepAI:", error);
-      return "Error al llamar a DeepAI.";
-    }
-  };
-
   return (
     <>
       <div>
+        <div className="mb-3">
+          <Search
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar herramienta..."
+          />
+        </div>
+
         <div className="flex flex-row flex-wrap gap-4 justify-center">
           {filteredTools.map((tool) => (
             <div
@@ -219,13 +200,9 @@ const Register: React.FC<ToolProps> = () => {
                     : new Date(tool.receivedAt.seconds * 1000).toLocaleString()}
                 </div>
               )}
-              {tool.autorized ? (
-                <div className=" tracking-tight text-gray-900 dark:text-white my-2 ml-2">
+              {tool.autorized && (
+                <div className="tracking-tight text-gray-900 dark:text-white my-2 ml-2">
                   Autorizado por {tool.autorized}
-                </div>
-              ) : (
-                <div className="bg-red-500 text-white p-2 rounded">
-                  Sin autorizacion
                 </div>
               )}
               <div className="p-5">
@@ -234,21 +211,14 @@ const Register: React.FC<ToolProps> = () => {
                     {tool.tool}
                   </h5>
                   <small className="tracking-tight text-gray-900 dark:text-white">
-                    Fecha de registro:{" "}
-                    {tool.date
-                      ? new Date(tool.date).toLocaleString()
-                      : new Date().toLocaleString()}
+                    Fecha de registro: {tool.date}
                   </small>
                 </a>
                 <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                   <strong>{tool.responsible}</strong> indica que solicita la
                   salida de <strong>{tool.tool}</strong> por motivo de{" "}
-                  <strong>{tool.reason}</strong> y que será devuelto el{" "}
-                  <strong>
-                    {tool.returnDate instanceof Timestamp
-                      ? tool.returnDate.toDate().toLocaleString()
-                      : tool.returnDate}
-                  </strong>
+                  <strong>{tool.reason}</strong> y que sera devuelto el{" "}
+                  <strong>{tool.returnDate}</strong>
                 </p>
               </div>
 
@@ -256,32 +226,28 @@ const Register: React.FC<ToolProps> = () => {
                 {tool.status !== "ok" && (
                   <div>
                     <span className="px-2 py-1 rounded text-xs font-bold bg-red-500 text-white">
-                      Fuera
+                      FUERA
                     </span>
                   </div>
                 )}
-
                 <div>
-                  {userRole === "quien_recibe" && (
+                  <button
+                    className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
+                    disabled={tool.status === "ok"}
+                    onClick={() => handleSetOk(tool.id)}
+                  >
+                    {tool.status === "ok"
+                      ? `Recibido por ${tool.receivedBy}`
+                      : "recibir"}
+                  </button>
+                  {userRole === "admin" && (
                     <button
-                      className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
-                      disabled={tool.status === "ok"}
-                      onClick={() => handleSetOk(tool.id)}
+                      className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
+                      onClick={() => handleAutirized(tool.id)}
                     >
-                      {tool.status === "ok"
-                        ? `Recibido por ${tool.receivedBy}`
-                        : "Recibir"}
+                      Autorizar
                     </button>
                   )}
-                  {!tool.autorized &&
-                    (userRole === "admin" || userRole === "autorizador") && (
-                      <button
-                        className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
-                        onClick={() => handleAutirized(tool.id)}
-                      >
-                        Autorizar
-                      </button>
-                    )}
                 </div>
               </div>
 
