@@ -23,11 +23,14 @@ interface FormData {
 }
 
 const ToolForm: React.FC = () => {
-  //Estados de empleados y motivo de salidas
-  const [employes, setEmployes] = useState<{ id: number; name: string }[]>([]);
-  const [reason, setReason] = useState<{ id: number; descripcion: string }[]>(
-    []
-  );
+  // Creacion de estados compuestos
+  const [stateToolsForm, setStateToolsForm] = useState<{
+    employes: { id: number; name: string }[];
+    reason: { id: number; description: string }[];
+  }>({
+    employes: [],
+    reason: [],
+  });
 
   const [photoError, setPhotoError] = useState<string | null>(null);
   // Estado para almacenar datos del formulario en un objeto
@@ -67,20 +70,24 @@ const ToolForm: React.FC = () => {
 
   // Capturar datos del formulario
   useEffect(() => {
-    const fetchEmployes = () => {
+    const fetchEmployesAndReasons = () => {
       try {
-        try {
-          setReason(ReasonData.activities);
-          setEmployes(EmployesData.employesDaat); // Guarda los datos en el estado
-        } catch (error) {
-          console.error("Error al cargar los empleados: ", error);
-        }
+        setStateToolsForm((prev) => ({
+          ...prev,
+          reason: ReasonData.activities.map(
+            (item: { id: number; descripcion: string }) => ({
+              id: item.id,
+              description: item.descripcion,
+            })
+          ),
+          employes: EmployesData.employesDaat,
+        }));
       } catch (error) {
-        console.error("Error al cargar los empleados: ", error);
+        console.error("Error al cargar los datos: ", error);
       }
     };
 
-    fetchEmployes();
+    fetchEmployesAndReasons();
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -163,7 +170,7 @@ const ToolForm: React.FC = () => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
               <option value="">Selecciona un empleado</option>
-              {employes.map((employe) => (
+              {stateToolsForm.employes.map((employe) => (
                 <option key={employe.id} value={employe.name}>
                   {employe.name}
                 </option>
@@ -247,9 +254,9 @@ const ToolForm: React.FC = () => {
               required
             >
               <option value="">Selecciona el motivo</option>
-              {reason.map((reason) => (
-                <option key={reason.id} value={reason.descripcion}>
-                  {reason.descripcion}
+              {stateToolsForm.reason.map((reason) => (
+                <option key={reason.id} value={reason.description}>
+                  {reason.description}
                 </option>
               ))}
             </select>

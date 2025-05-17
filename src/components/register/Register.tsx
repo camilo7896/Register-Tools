@@ -20,6 +20,7 @@ import { serverTimestamp } from "firebase/firestore";
 import Search from "../search/Search";
 import "../../styles/style.scss";
 import PhotoModal from "../modals/PhotoModal";
+import Logo from "../../../public/no-image.jpg";
 const db = getFirestore(appFirebase);
 const auth = getAuth(appFirebase);
 
@@ -43,10 +44,8 @@ const Register: React.FC<ToolProps> = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [userRole, setUserRole] = useState<string | null>(null);
-
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [photoLoading, setPhotoLoading] = useState<{ [key: string]: boolean }>(
     {}
   );
@@ -64,7 +63,7 @@ const Register: React.FC<ToolProps> = () => {
   const [lastDoc, setLastDoc] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 100;
 
   const fetchTools = async (nextPage = false) => {
     setLoading(true);
@@ -177,7 +176,7 @@ const Register: React.FC<ToolProps> = () => {
 
   return (
     <>
-      <div>
+      <div className="m-3">
         <div className="mb-3">
           <Search
             value={search}
@@ -190,22 +189,30 @@ const Register: React.FC<ToolProps> = () => {
           {filteredTools.map((tool) => (
             <div
               key={tool.id}
-              className="max-w-sm bg-gray-100 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col justify-between h-[400px]"
+              className="max-w-sm bg-gray-100 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 flex flex-col justify-between h-auto"
             >
-              {tool.receivedAt && (
-                <div className="primary-color">
-                  Recibido el:{" "}
-                  {tool.receivedAt.toDate
-                    ? tool.receivedAt.toDate().toLocaleString()
-                    : new Date(tool.receivedAt.seconds * 1000).toLocaleString()}
-                </div>
-              )}
+              <div className="mt-2 w-full">
+                {tool.receivedAt ? (
+                  <div className="bg-green-500 text-center">
+                    Recibido el:{" "}
+                    {tool.receivedAt.toDate
+                      ? tool.receivedAt.toDate().toLocaleString()
+                      : new Date(
+                          tool.receivedAt.seconds * 1000
+                        ).toLocaleString()}
+                  </div>
+                ) : (
+                  <div className="bg-red-700 text-white text-center">
+                    <p>{tool.status}</p>
+                  </div>
+                )}
+              </div>
               {tool.autorized && (
                 <div className="tracking-tight text-gray-900 dark:text-white my-2 ml-2">
                   Autorizado por {tool.autorized}
                 </div>
               )}
-              <div className="p-5">
+              <div className="px-2">
                 <a href="#">
                   <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                     {tool.tool}
@@ -214,7 +221,7 @@ const Register: React.FC<ToolProps> = () => {
                     Fecha de registro: {tool.date}
                   </small>
                 </a>
-                <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                <p className=" font-normal text-gray-700 dark:text-gray-400">
                   <strong>{tool.responsible}</strong> indica que solicita la
                   salida de <strong>{tool.tool}</strong> por motivo de{" "}
                   <strong>{tool.reason}</strong> y que sera devuelto el{" "}
@@ -222,37 +229,33 @@ const Register: React.FC<ToolProps> = () => {
                 </p>
               </div>
 
-              <div className="flex justify-evenly">
-                {tool.status !== "ok" && (
-                  <div>
-                    <span className="px-2 py-1 rounded text-xs font-bold bg-red-500 text-white">
-                      FUERA
-                    </span>
-                  </div>
-                )}
+              <div className="flex justify-evenly w-full ">
                 <div>
-                  <button
-                    className="ml-2 px-2 py-1 bg-green-600 text-white rounded text-xs"
-                    disabled={tool.status === "ok"}
-                    onClick={() => handleSetOk(tool.id)}
-                  >
-                    {tool.status === "ok"
-                      ? `Recibido por ${tool.receivedBy}`
-                      : "recibir"}
-                  </button>
-                  {userRole === "admin" && (
+                  {userRole === "quien_recibe" && (
                     <button
-                      className="ml-2 px-2 py-1 bg-indigo-600 text-white rounded text-xs"
-                      onClick={() => handleAutirized(tool.id)}
+                      className="bg-green-400 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                      disabled={tool.status === "ok"}
+                      onClick={() => handleSetOk(tool.id)}
                     >
-                      Autorizar
+                      {tool.status === "ok"
+                        ? `Recibido por ${tool.receivedBy}`
+                        : "Recibir"}
                     </button>
                   )}
+                  {!tool.autorized &&
+                    (userRole === "admin" || userRole === "autorizador") && (
+                      <button
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleAutirized(tool.id)}
+                      >
+                        Autorizar
+                      </button>
+                    )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-center pb-3">
-                {tool.photos && tool.photos.length > 0 && (
+              <div className="flex items-center justify-center p-3">
+                {tool.photos && tool.photos.length > 0 ? (
                   <div className="overflow-x-auto flex gap-2 p-2">
                     {tool.photos.map((url, index) => (
                       <div key={index} className="relative">
@@ -262,8 +265,9 @@ const Register: React.FC<ToolProps> = () => {
                             <span>Cargando...</span>
                           </div>
                         )}
+
                         <img
-                          src={url}
+                          src={url} // Aquí cargamos la foto
                           alt={`Foto ${index + 1}`}
                           className="h-20 w-20 object-cover rounded cursor-pointer"
                           loading="lazy"
@@ -274,6 +278,13 @@ const Register: React.FC<ToolProps> = () => {
                       </div>
                     ))}
                   </div>
+                ) : (
+                  // Cuando no hay fotos, mostrar imagen local
+                  <img
+                    src={Logo} // Cambia esto a la ruta de tu imagen local
+                    alt="Imagen predeterminada"
+                    className="h-20 w-20 object-cover rounded"
+                  />
                 )}
               </div>
             </div>
